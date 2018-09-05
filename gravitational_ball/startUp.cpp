@@ -3,9 +3,14 @@
 #include <conio.h>
 #include <windows.h>
 #include "change2rightAngle.h"
+#define normalball_number  10
+#define superball_number  10
 
-double a = 0.4;//加速度
-double circleVelocity = 0.5;
+double fin_main_radius = 8;
+double fin_cent_radius = 3;
+double ratio = 400;//缩放比例
+double a = 0.07;//加速度
+double circleVelocity = 0.7;
 double maxDistance = 300;
 double program_x = 600;
 double program_y = 600;
@@ -22,9 +27,19 @@ typedef struct mainBall{
 	double radius;
 	double velocity;
 }MAINBALL;
+typedef struct normalBall{
+	double distance;
+	double angle;
+	double x;
+	double y;
+	double radius;
+	int kind;
+}NORMALBALL;
 
 CENTRALBALL centball;
 MAINBALL mainball;
+NORMALBALL normalball[normalball_number];
+NORMALBALL superball[superball_number];
 
 void defaultData(){
 	centball.x = program_x/2;
@@ -38,8 +53,13 @@ void defaultData(){
 	IMAGE sun_img;
 	IMAGE r_sun_img;
 	change2rightAngle(centball.x,centball.y,mainball.distance,mainball.angle,&mainball.x,&mainball.y);//初始化值
+	for(int i = 0;i < normalball_number;i++){
+		normalball[i].distance = 70;
+		normalball[i].angle = 36 * i;
+		normalball[i].radius = 2;
+		change2rightAngle(centball.x,centball.y,normalball[i].distance,normalball[i].angle,&normalball[i].x,&normalball[i].y);
+	}
 	initgraph(program_x,program_y);
-	
 	//setbkcolor(WHITE);
 	//cleardevice();
 	loadimage(&bkgrd_img,_T("./img/background.jpg"));
@@ -50,11 +70,15 @@ void defaultData(){
 	//putimage(0,0,&sun_img);
 }
 void logicFunction(){
+	//if(centball.radius>fin_cent_radius) centball.radius =fin_cent_radius * ratio / mainball.distance;
+	if(mainball.radius>fin_main_radius) mainball.radius =fin_main_radius * ratio / mainball.distance;
+	for(int i = 0;i < normalball_number;i++){
+		normalball[i].radius = 4 * ratio / mainball.distance;
+	}
 	change2rightAngle(centball.x,centball.y,mainball.distance,mainball.angle,&mainball.x,&mainball.y);
-
 	if(mainball.angle==360) mainball.angle = 0;
-	if(mainball.distance < mainball.radius + centball.radius + mainball.velocity) mainball.velocity = -mainball.velocity -a;
-	if(mainball.distance >= maxDistance) mainball.velocity = a;
+	if(mainball.distance < mainball.radius + centball.radius ) mainball.velocity = -mainball.velocity -a;
+	if(mainball.velocity == 0) mainball.velocity = a;
 	
 	if(kbhit()){
 		char ch = getch();
@@ -62,13 +86,17 @@ void logicFunction(){
 				mainball.angle += circleVelocity;	
 		}		
 	}
-	
+	//centball.x -= 0.1;
+	//centball.y += 0.2;
 	mainball.distance -= mainball.velocity;
 	mainball.velocity += a;
 }
 
 void printAll(){
 	cleardevice();
+	for(int i = 0;i < normalball_number;i++){
+		circle(normalball[i].x,normalball[i].y,normalball[i].radius);
+	}
 	circle(centball.x, centball.y,centball.radius);
 	circle(mainball.x,mainball.y,mainball.radius); 
 	line(centball.x,centball.y,mainball.x,mainball.y);
