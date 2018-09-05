@@ -1,2 +1,2 @@
 #pragma once
-void change2rightAngle(int c_x,int c_y,int distance,double angle,int *x,int *y);
+void change2rightAngle(double c_x,double c_y,double distance,double angle,double *x,double *y);
