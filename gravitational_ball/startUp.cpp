@@ -7,7 +7,7 @@
 #include "change2rightAngle.h"
 #define normalball_number  10
 #define superball_number  10
-#define randomball_number 30
+#define randomball_number 30 //随机球总数
 #define randomball_angle 360
 
 double ratio = 300;//缩放比例
@@ -17,6 +17,7 @@ double minDistance = 400;//最近边界（开始缩放边界）
 double maxDistance = 400;//最远边界
 double program_x = 900;
 double program_y = 900;//屏幕大小
+IMAGE bkgImg;//背景图片
 typedef struct centPoint{
 	double x;
 	double y;
@@ -95,7 +96,7 @@ void defaultData(){
 	for(int i = 0;i < randomball_number;i++){
 		random_distance[i] *= 5; 
 	}
-	
+//	
 	for(int i = 0;i < randomball_number;i++){
 		randomball[i].kind = 1;
 		randomball[i].angle = random_angle[i];
@@ -163,8 +164,8 @@ void logicFunction(){
 		}
 	}
 	//碰撞中心球
-	if(centball.distance + mainball.distance < centball.radius + mainball.radius){
-		//_getch();
+	if(sqrt(pow((centball.x - mainball.x),2)+pow((centball.y - mainball.y),2)) < centball.radius + mainball.radius){
+		_getch();
 		centball.velocity = -centball.velocity;
 		mainball.velocity = -mainball.velocity;
 		
@@ -193,6 +194,8 @@ void logicFunction(){
 
 void printAll(){
 	cleardevice();
+	loadimage(&bkgImg,_T(".//img//background.jpg"));
+	putimage(0,0,900,900,&bkgImg,900-centball.x,900-centball.y);
 	setfillcolor(WHITE);
 	for(int i = 0;i < normalball_number;i++){
 		if(normalball[i].kind != -1){
@@ -204,11 +207,11 @@ void printAll(){
 			fillcircle(randomball[i].x,randomball[i].y,randomball[i].radius);
 		}
 	}
-	fillcircle(centball.x, centball.y,centball.radius);
+	fillcircle(centball.x,centball.y,centball.radius);
 	fillcircle(mainball.x,mainball.y,mainball.radius);
-	//line(centball.x,centball.y,mainball.x,mainball.y);
+	setfillcolor(WHITE);
+	line(centball.x,centball.y,mainball.x,mainball.y);
 	setlinecolor(WHITE);
-	
 	Sleep(7);
 	
 	
